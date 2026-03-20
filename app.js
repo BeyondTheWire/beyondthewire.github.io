@@ -1,22 +1,20 @@
 (function() {
   function showPage(id) {
     var pages = document.querySelectorAll('.page');
-    for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
+    for (var i = 0; i < pages.length; i++) { pages[i].classList.remove('active'); }
     var target = document.getElementById('page-' + id);
-    if (target) target.classList.add('active');
+    if (target) { target.classList.add('active'); }
     var links = document.querySelectorAll('.nav-links a');
-    for (var j = 0; j < links.length; j++) links[j].classList.remove('active');
+    for (var j = 0; j < links.length; j++) { links[j].classList.remove('active'); }
     var navEl = document.getElementById('nav-' + id);
-    if (navEl) navEl.classList.add('active');
+    if (navEl) { navEl.classList.add('active'); }
     window.scrollTo(0, 0);
   }
 
-  // Event delegation - attach to document so Cloudflare cannot interfere
   document.addEventListener('click', function(e) {
     var el = e.target;
-    // Walk up the DOM in case click was on a child element (e.g. <span> inside <a>)
     while (el && el !== document) {
-      var page = el.getAttribute('data-page');
+      var page = el.getAttribute && el.getAttribute('data-page');
       if (page) {
         e.preventDefault();
         showPage(page);
@@ -26,7 +24,6 @@
     }
   });
 
-  // Contact form - Formspree AJAX
   var form = document.getElementById('fs-form');
   if (form) {
     form.addEventListener('submit', function(e) {
