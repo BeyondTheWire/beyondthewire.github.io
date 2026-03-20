@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="cf-rocket-loader" content="off">
+<title>Beyond the Wire — IT Support</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Radley:ital@0;1&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #111111;
+    --dark: #181818;
+    --panel: #1f1f1f;
+    --border: #2e2e2e;
+    --muted: #444444;
+    --text-dim: #9a9282;
+    --text: #e1d6cb;
+    --white: #f5f0ea;
+    --secondary: #57858a;
+    --red: #c0271f;
+    --yellow: #e8b84b;
+    --accent: #57858a;
+    --accent-dim: rgba(87,133,138,0.15);
+    --accent-glow: rgba(87,133,138,0.25);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--text); font-family: 'Radley', serif; font-weight: 400; overflow-x: hidden; }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 48px; height: 68px; background: rgba(17,17,17,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+  .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.12em; color: var(--white); text-decoration: none; cursor: pointer; }
+  .nav-logo .dot { color: var(--secondary); }
+  .nav-links { display: flex; gap: 36px; }
+  .nav-links a { font-family: 'Radley', serif; font-size: 14px; letter-spacing: 0.03em; color: var(--text-dim); text-decoration: none; transition: color 0.2s; cursor: pointer; }
+  .nav-links a:hover, .nav-links a.active { color: var(--secondary); }
+  .nav-cta { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; background: var(--red); color: var(--white); padding: 9px 20px; font-weight: 500; transition: opacity 0.2s; cursor: pointer; border: none; }
+  .nav-cta:hover { opacity: 0.85; }
+
+  .page { display: none; padding-top: 68px; min-height: 100vh; }
+  .page.active { display: block; }
+
+  /* HOME */
+  .hero { position: relative; min-height: calc(100vh - 68px); display: flex; align-items: center; padding: 80px 48px; overflow: hidden; }
+  .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.3; }
+  .hero-glow { position: absolute; top: -200px; right: -200px; width: 700px; height: 700px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 65%); pointer-events: none; }
+  .hero-content { position: relative; max-width: 720px; }
+  .hero-tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--secondary); margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+  .hero-tag::before { content: ''; display: block; width: 32px; height: 1px; background: var(--secondary); }
+  .hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(64px, 10vw, 110px); line-height: 0.92; letter-spacing: 0.02em; color: var(--white); margin-bottom: 28px; }
+  .hero h1 em { font-style: normal; color: var(--yellow); }
+  .hero .hero-lead { font-family: 'Radley', serif; font-size: 19px; line-height: 1.8; color: var(--text-dim); max-width: 540px; margin-bottom: 48px; font-style: italic; }
+  .hero-actions { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+
+  .btn-primary { background: var(--red); color: var(--white); padding: 14px 32px; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: opacity 0.2s, transform 0.2s; display: inline-block; cursor: pointer; border: none; }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-outline { border: 1px solid var(--muted); color: var(--text); padding: 13px 32px; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: border-color 0.2s, color 0.2s; display: inline-block; cursor: pointer; }
+  .btn-outline:hover { border-color: var(--secondary); color: var(--secondary); }
+
+  .stats-bar { background: var(--panel); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); display: flex; justify-content: center; padding: 0 48px; }
+  .stats-inner { display: flex; align-items: stretch; max-width: 960px; width: 100%; }
+  .stat { flex: 1; padding: 40px 28px; text-align: center; border-right: 1px solid var(--border); }
+  .stat:last-child { border-right: none; }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--yellow); line-height: 1; margin-bottom: 8px; letter-spacing: 0.05em; }
+  .stat-label { font-family: 'Radley', serif; font-size: 13px; color: var(--text-dim); font-style: italic; }
+
+  .marquee-wrap { overflow: hidden; border-bottom: 1px solid var(--border); background: var(--black); padding: 18px 0; }
+  .marquee-track { display: flex; gap: 48px; animation: marquee 28s linear infinite; white-space: nowrap; }
+  .marquee-item { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); flex-shrink: 0; }
+  .marquee-item span { color: var(--secondary); margin: 0 4px; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  section { padding: 100px 48px; }
+  .section-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--secondary); margin-bottom: 16px; }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(40px, 6vw, 68px); color: var(--white); line-height: 1; letter-spacing: 0.02em; margin-bottom: 16px; }
+  .section-sub { font-family: 'Radley', serif; font-size: 17px; color: var(--text-dim); line-height: 1.75; max-width: 580px; margin-bottom: 56px; font-style: italic; }
+
+  .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); max-width: 1100px; }
+  .service-card { background: var(--dark); padding: 40px 36px; position: relative; overflow: hidden; transition: background 0.3s; }
+  .service-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--yellow); transform: scaleX(0); transform-origin: left; transition: transform 0.3s; }
+  .service-card:hover { background: var(--panel); }
+  .service-card:hover::before { transform: scaleX(1); }
+  .service-icon { font-size: 28px; margin-bottom: 20px; display: block; }
+  .service-card h3 { font-family: 'Radley', serif; font-size: 20px; color: var(--white); margin-bottom: 10px; }
+  .service-card p { font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.7; color: var(--text-dim); font-weight: 300; }
+
+  /* ABOUT */
+  .about-hero { padding: 80px 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; border-bottom: 1px solid var(--border); }
+  .about-frame { background: var(--panel); border: 1px solid var(--border); padding: 48px; position: relative; overflow: hidden; }
+  .about-frame::after { content: ''; position: absolute; bottom: -12px; right: -12px; width: 100%; height: 100%; border: 1px solid var(--secondary); z-index: -1; }
+  .about-frame .big-letter { font-family: 'Bebas Neue', sans-serif; font-size: 160px; color: var(--border); line-height: 1; position: absolute; top: 16px; right: 24px; pointer-events: none; user-select: none; }
+  .about-badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--secondary); border: 1px solid var(--accent-dim); background: var(--accent-dim); padding: 6px 14px; display: inline-block; margin-bottom: 28px; }
+  .about-frame h2 { font-family: 'Bebas Neue', sans-serif; font-size: 52px; color: var(--white); line-height: 1; letter-spacing: 0.02em; margin-bottom: 20px; }
+  .about-frame p { font-family: 'Radley', serif; font-size: 16px; line-height: 1.85; color: var(--text-dim); font-style: italic; }
+
+  .value-list { margin-top: 40px; display: flex; flex-direction: column; gap: 20px; }
+  .value-item { display: flex; gap: 20px; align-items: flex-start; padding: 20px; background: var(--panel); border: 1px solid var(--border); transition: border-color 0.2s; }
+  .value-item:hover { border-color: var(--muted); }
+  .value-num { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--yellow); line-height: 1; flex-shrink: 0; width: 40px; }
+  .value-body h4 { font-family: 'Radley', serif; font-size: 16px; color: var(--white); margin-bottom: 6px; }
+  .value-body p { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-dim); line-height: 1.65; font-weight: 300; }
+
+  .mission-strip { background: var(--red); padding: 64px 48px; text-align: center; }
+  .mission-strip blockquote { font-family: 'Radley', serif; font-size: clamp(20px, 3vw, 36px); color: var(--white); line-height: 1.6; max-width: 860px; margin: 0 auto; font-style: italic; }
+  .mission-strip cite { display: block; margin-top: 24px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-style: normal; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+
+  /* SERVICES */
+  .services-header { padding: 80px 48px 60px; border-bottom: 1px solid var(--border); }
+  .service-row { display: grid; grid-template-columns: 280px 1fr; border-bottom: 1px solid var(--border); min-height: 200px; }
+  .service-row:hover .service-row-left { background: var(--accent-dim); }
+  .service-row-left { padding: 40px; border-right: 1px solid var(--border); background: var(--panel); transition: background 0.3s; display: flex; flex-direction: column; justify-content: flex-start; gap: 16px; }
+  .service-row-num { font-family: 'Bebas Neue', sans-serif; font-size: 56px; color: var(--border); line-height: 1; }
+  .service-row-img { width: 100%; height: 160px; object-fit: cover; display: block; }
+  .service-row-name { font-family: 'Radley', serif; font-size: 19px; color: var(--white); }  .service-row-right { padding: 48px 56px; display: flex; flex-direction: column; justify-content: center; }
+  .service-row-right h3 { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--white); letter-spacing: 0.03em; margin-bottom: 16px; }
+  .service-row-right p { font-family: 'Radley', serif; font-size: 16px; color: var(--text-dim); line-height: 1.8; max-width: 560px; margin-bottom: 24px; font-style: italic; }
+  .service-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--secondary); border: 1px solid var(--accent-dim); background: var(--accent-dim); padding: 5px 12px; }
+
+  .pricing-note { background: var(--panel); border: 1px solid var(--border); padding: 48px; margin: 64px 48px; display: flex; align-items: flex-start; gap: 32px; }
+  .pricing-icon { font-size: 40px; flex-shrink: 0; }
+  .pricing-note h3 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--white); letter-spacing: 0.03em; margin-bottom: 10px; }
+  .pricing-note p { font-family: 'Radley', serif; font-size: 16px; color: var(--text-dim); line-height: 1.75; margin-bottom: 24px; font-style: italic; }
+
+  /* CONTACT */
+  .contact-wrap { display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 68px); }
+  .contact-left { background: var(--panel); border-right: 1px solid var(--border); padding: 80px 64px; display: flex; flex-direction: column; justify-content: space-between; }
+  .contact-info-list { margin-top: 48px; display: flex; flex-direction: column; gap: 32px; }
+  .contact-info-item { display: flex; gap: 20px; align-items: flex-start; }
+  .contact-info-icon { width: 42px; height: 42px; border: 1px solid var(--border); background: var(--dark); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .contact-info-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--secondary); margin-bottom: 4px; }
+  .contact-info-val { font-family: 'Radley', serif; font-size: 16px; color: var(--text); line-height: 1.5; }
+  .contact-bottom-note { font-family: 'Radley', serif; font-size: 14px; color: var(--text-dim); font-style: italic; padding-top: 40px; border-top: 1px solid var(--border); margin-top: auto; line-height: 1.7; }
+  .contact-right { padding: 80px 64px; background: var(--dark); }
+
+  .form-group { margin-bottom: 24px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; }
+  input, textarea, select { width: 100%; background: var(--panel); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; font-family: 'Radley', serif; font-size: 15px; outline: none; transition: border-color 0.2s; appearance: none; }
+  input::placeholder, textarea::placeholder { color: var(--muted); font-style: italic; }
+  input:focus, textarea:focus, select:focus { border-color: var(--secondary); }
+  textarea { resize: vertical; min-height: 120px; }
+  select { cursor: pointer; }
+  select option { background: var(--panel); }
+  .form-submit { width: 100%; background: var(--red); color: var(--white); border: none; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; margin-top: 8px; }
+  .form-submit:hover { opacity: 0.87; }
+  .form-success { display: none; text-align: center; padding: 40px; border: 1px solid var(--secondary); background: var(--accent-dim); }
+  .form-success h3 { font-family: 'Radley', serif; font-size: 28px; color: var(--secondary); margin-bottom: 8px; }
+  .form-success p { font-family: 'Radley', serif; font-size: 15px; color: var(--text-dim); font-style: italic; }
+
+  footer { background: var(--panel); border-top: 1px solid var(--border); padding: 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.12em; color: var(--white); }
+  .footer-logo span { color: var(--secondary); }
+  .footer-copy { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--text-dim); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-up { animation: fadeUp 0.6s ease forwards; }
+  .fade-up-1 { animation-delay: 0.1s; opacity: 0; }
+  .fade-up-2 { animation-delay: 0.22s; opacity: 0; }
+  .fade-up-3 { animation-delay: 0.34s; opacity: 0; }
+  .fade-up-4 { animation-delay: 0.46s; opacity: 0; }
+
+  @media (max-width: 860px) {
+    nav { padding: 0 24px; }
+    .nav-links { display: none; }
+    section, .services-header { padding: 64px 24px; }
+    .hero { padding: 60px 24px; }
+    .about-hero { grid-template-columns: 1fr; gap: 48px; padding: 60px 24px; }
+    .service-row { grid-template-columns: 1fr; }
+    .service-row-left { border-right: none; border-bottom: 1px solid var(--border); }
+    .service-row-right { padding: 36px 28px; }
+    .contact-wrap { grid-template-columns: 1fr; }
+    .contact-left { padding: 60px 32px; }
+    .contact-right { padding: 60px 32px; }
+    .form-row { grid-template-columns: 1fr; }
+    .stats-inner { flex-direction: column; }
+    .stat { border-right: none; border-bottom: 1px solid var(--border); padding: 28px; }
+    footer { padding: 32px 24px; flex-direction: column; align-items: flex-start; }
+    .pricing-note { padding: 32px 24px; margin: 40px 24px; flex-direction: column; gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" data-page="home">BEYOND THE <span class="dot">WIRE</span></a>
+  <div class="nav-links">
+    <a id="nav-home" class="active" data-page="home">Home</a>
+    <a id="nav-about" data-page="about">About</a>
+    <a id="nav-services" data-page="services">Services</a>
+    <a id="nav-contact" data-page="contact">Contact</a>
+  </div>
+  <button class="nav-cta" data-page="contact">Get Help Now</button>
+</nav>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <div class="hero-tag fade-up fade-up-1">Personal Tech Support · Fresno, CA</div>
+      <h1 class="fade-up fade-up-2">TECH HELP,<br><em>FOR REAL PEOPLE.</em></h1>
+      <p class="hero-lead fade-up fade-up-3">Frustrated with your computer, Wi-Fi, or a device that just won't cooperate? We come to you — no jargon, no judgment, just friendly tech support that actually makes sense.</p>
+      <div class="hero-actions fade-up fade-up-4">
+        <a class="btn-primary" data-page="services" href="#">See What We Fix</a>
+        <a class="btn-outline" data-page="contact" href="#">Book a Visit</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat"><div class="stat-num">On-Site</div><div class="stat-label">We come to you</div></div>
+      <div class="stat"><div class="stat-num">Plain</div><div class="stat-label">No tech jargon, ever</div></div>
+      <div class="stat"><div class="stat-num">Fast</div><div class="stat-label">Quick response & turnaround</div></div>
+      <div class="stat"><div class="stat-num">Local</div><div class="stat-label">Fresno & surrounding areas</div></div>
+    </div>
+  </div>
+
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <span class="marquee-item">Slow Computer? <span>✦</span></span>
+      <span class="marquee-item">Wi-Fi Not Working? <span>✦</span></span>
+      <span class="marquee-item">New Device Setup <span>✦</span></span>
+      <span class="marquee-item">Printer Problems <span>✦</span></span>
+      <span class="marquee-item">Virus Removal <span>✦</span></span>
+      <span class="marquee-item">Password Help <span>✦</span></span>
+      <span class="marquee-item">New Screen Setup <span>✦</span></span>
+      <span class="marquee-item">Tech Guidance <span>✦</span></span>
+      <span class="marquee-item">Slow Computer? <span>✦</span></span>
+      <span class="marquee-item">Wi-Fi Not Working? <span>✦</span></span>
+      <span class="marquee-item">New Device Setup <span>✦</span></span>
+      <span class="marquee-item">Printer Problems <span>✦</span></span>
+      <span class="marquee-item">Virus Removal <span>✦</span></span>
+      <span class="marquee-item">Password Help <span>✦</span></span>
+      <span class="marquee-item">New Screen Setup <span>✦</span></span>
+      <span class="marquee-item">Tech Guidance <span>✦</span></span>
+    </div>
+  </div>
+
+  <section>
+    <div class="section-tag">Common Problems We Solve</div>
+    <div class="section-title">SOUND FAMILIAR?</div>
+    <p class="section-sub">If any of these feel like your situation, you're in exactly the right place.</p>
+    <div class="services-grid">
+      <div class="service-card"><span class="service-icon">🖥️</span><h3>Slow or Broken Computer</h3><p>We diagnose and fix sluggish, freezing, or crashing desktops and laptops — so they feel like new again.</p></div>
+      <div class="service-card"><span class="service-icon">📶</span><h3>Wi-Fi Keeps Dropping</h3><p>Can't stay connected? We find the problem — whether it's your router, device, or service — and fix it.</p></div>
+      <div class="service-card"><span class="service-icon">🖨️</span><h3>New Device Won't Set Up</h3><p>New printer, monitor, or gadget giving you trouble? We get it working right and show you how to use it.</p></div>
+      <div class="service-card"><span class="service-icon">🛡️</span><h3>Virus or Security Worries</h3><p>Pop-ups, strange behavior, or a hacked account? We clean it up and help keep you protected going forward.</p></div>
+    </div>
+    <br><br>
+    <a class="btn-primary" data-page="services" href="#">View All Services →</a>
+  </section>
+
+  <footer>
+    <div class="footer-logo">BEYOND THE <span>WIRE</span></div>
+    <div class="footer-copy">© 2025 Beyond the Wire · All rights reserved</div>
+  </footer>
+</div>
+
+<!-- ABOUT -->
+<div id="page-about" class="page">
+  <div class="about-hero">
+    <div class="about-visual">
+      <div class="about-frame">
+        <img src="logo.png" alt="Beyond the Wire Logo" style="position:absolute; top:16px; right:24px; width:160px; opacity:0.15; pointer-events:none; user-select:none;">
+        <div class="about-badge">Est. 2025 · Fresno, CA</div>
+        <h2>TECH HELP<br>WITHOUT THE<br>HEADACHE.</h2>
+        <p>We started Beyond the Wire because everyone deserves patient, honest help with their technology — not just businesses with IT departments. No experience required, no question too basic.</p>
+      </div>
+    </div>
+    <div class="about-text">
+      <div class="section-tag">Our Story</div>
+      <div class="section-title">WHO WE ARE</div>
+      <p class="section-sub" style="margin-bottom:0">Beyond the Wire is a personal technology support service based in Fresno, CA. We help everyday people get the most out of their computers, phones, routers, and devices. Whether you're a retiree learning a new laptop or a parent setting up a home network — we're here for you, at your pace.</p>
+      <div class="value-list">
+        <div class="value-item">
+          <div class="value-num">01</div>
+          <div class="value-body"><h4>We Speak Plain English</h4><p>No confusing terms, no condescension. We explain what's wrong and what we're doing in simple language you can actually understand.</p></div>
+        </div>
+        <div class="value-item">
+          <div class="value-num">02</div>
+          <div class="value-body"><h4>We Come to You</h4><p>No need to pack anything up or drive anywhere. We visit your home and work in your own environment, on your schedule.</p></div>
+        </div>
+        <div class="value-item">
+          <div class="value-num">03</div>
+          <div class="value-body"><h4>We're Patient & Honest</h4><p>We take the time to make sure you understand and feel comfortable. We only recommend what you actually need — nothing more.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mission-strip">
+    <blockquote>"Our mission is to make technology less stressful for the people who need it most — no matter your experience level, we're here to help."</blockquote>
+    <cite>— Beyond the Wire</cite>
+  </div>
+
+  <footer>
+    <div class="footer-logo">BEYOND THE <span>WIRE</span></div>
+    <div class="footer-copy">© 2025 Beyond the Wire · All rights reserved</div>
+  </footer>
+</div>
+
+<!-- SERVICES -->
+<div id="page-services" class="page">
+  <div class="services-header">
+    <div class="section-tag">What We Offer</div>
+    <div class="section-title">OUR SERVICES</div>
+    <p class="section-sub" style="margin-bottom:0">Whether your computer is acting up, your Wi-Fi keeps dropping, or you just got a new device and don't know where to start — we're here. No issue too small, no question off-limits.</p>
+  </div>
+
+  <div class="service-row">
+    <div class="service-row-left"><div class="service-row-num">01</div><img class="service-row-img" src="computer_help.jpg" alt="Computer Help"><div class="service-row-name">🖥️ Computer Help</div></div>
+    <div class="service-row-right">
+      <h3>DESKTOP & LAPTOP SUPPORT</h3>
+      <p>Is your computer slow, crashing, or just not doing what it used to? We diagnose and fix common issues on both Windows and Mac — software glitches, startup errors, performance slowdowns, and more. We also help with software installation and system tune-ups to keep things running the way they should.</p>
+      <div class="service-tags"><span class="tag">Windows & Mac</span><span class="tag">Slow Performance</span><span class="tag">Startup Issues</span><span class="tag">Software Help</span></div>
+    </div>
+  </div>
+
+  <div class="service-row">
+    <div class="service-row-left"><div class="service-row-num">02</div><img class="service-row-img" src="wifi_internet.jpg" alt="Wi-Fi and Internet"><div class="service-row-name">📶 Wi-Fi & Internet</div></div>
+    <div class="service-row-right">
+      <h3>ROUTER & WI-FI SETUP</h3>
+      <p>Nothing is more frustrating than a slow or spotty internet connection. We troubleshoot Wi-Fi problems, set up new routers, extend your coverage to hard-to-reach rooms, and make sure all your devices — phones, tablets, laptops — are connected and working smoothly.</p>
+      <div class="service-tags"><span class="tag">Router Setup</span><span class="tag">Wi-Fi Drops</span><span class="tag">Coverage Help</span><span class="tag">All Devices</span></div>
+    </div>
+  </div>
+
+  <div class="service-row">
+    <div class="service-row-left"><div class="service-row-num">03</div><img class="service-row-img" src="device_setup.jpg" alt="Device Setup"><div class="service-row-name">🖨️ Device Setup</div></div>
+    <div class="service-row-right">
+      <h3>EQUIPMENT & DEVICE INSTALLATION</h3>
+      <p>Got a new printer, monitor, smart TV, or external drive that you can't get working? We handle the full setup — plugging everything in, installing the right software, and making sure it all plays nicely together. We'll also walk you through how to use it so you feel confident on your own.</p>
+      <div class="service-tags"><span class="tag">Printers</span><span class="tag">Monitors & TVs</span><span class="tag">External Drives</span><span class="tag">Smart Devices</span></div>
+    </div>
+  </div>
+
+  <div class="service-row">
+    <div class="service-row-left"><div class="service-row-num">04</div><img class="service-row-img" src="virus_security.jpg" alt="Virus and Security"><div class="service-row-name">🛡️ Virus & Security</div></div>
+    <div class="service-row-right">
+      <h3>VIRUS REMOVAL & PROTECTION</h3>
+      <p>Seeing strange pop-ups, unexpected slowdowns, or something just doesn't feel right? We scan for and remove malware, viruses, and unwanted programs — then help set up proper protection so it doesn't happen again. We'll also walk you through simple habits to stay safer online.</p>
+      <div class="service-tags"><span class="tag">Virus Removal</span><span class="tag">Malware Cleanup</span><span class="tag">Security Setup</span><span class="tag">Safe Browsing Tips</span></div>
+    </div>
+  </div>
+
+  <div class="service-row">
+    <div class="service-row-left"><div class="service-row-num">05</div><img class="service-row-img" src="personal_tech_guidance.jpg" alt="Personal Tech Guidance"><div class="service-row-name">💬 Personal Tech Guidance</div></div>
+    <div class="service-row-right">
+      <h3>ONE-ON-ONE TECH SUPPORT</h3>
+      <p>Not sure what device to buy next? Confused about how to use your phone, back up your photos, or set up email? Just want someone to sit with you and walk through it at your own pace? That's exactly what we do. No pressure, no rushing — just friendly, helpful conversation about your technology.</p>
+      <div class="service-tags"><span class="tag">Buying Advice</span><span class="tag">Walkthroughs</span><span class="tag">Photo Backups</span><span class="tag">Email & Accounts</span></div>
+    </div>
+  </div>
+
+  <div class="pricing-note">
+    <div class="pricing-icon">💬</div>
+    <div>
+      <h3>HONEST PRICING. NO SURPRISES.</h3>
+      <p>We believe tech help should be affordable and transparent. Every visit starts with a quick chat about what you need, and we'll always tell you what things will cost before we begin — no hidden fees, no pressure, no unnecessary upsells.</p>
+      <a class="btn-primary" data-page="contact" href="#">Book a Free Consultation</a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo">BEYOND THE <span>WIRE</span></div>
+    <div class="footer-copy">© 2025 Beyond the Wire · All rights reserved</div>
+  </footer>
+</div>
+
+<!-- CONTACT -->
+<div id="page-contact" class="page">
+  <div class="contact-wrap">
+    <div class="contact-left">
+      <div>
+        <div class="section-tag">Get in Touch</div>
+        <div class="section-title" style="font-size:48px; margin-bottom:16px;">WE'RE HERE TO HELP.</div>
+        <p style="font-family:'Radley',serif; font-size:16px; color:var(--text-dim); line-height:1.8; max-width:360px; font-style:italic;">Have a tech problem you can't figure out? Not sure if we can help? Just reach out — no question is too small. We're friendly, patient, and always happy to talk it through first.</p>
+        <div class="contact-info-list">
+          <div class="contact-info-item">
+            <div class="contact-info-icon">📧</div>
+            <div><div class="contact-info-label">Email</div><div class="contact-info-val"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d2a1a7a2a2bda0a692b0b7abbdbcb6a6bab7a5bba0b7fca7a1">[email&#160;protected]</a></div></div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-info-icon">📞</div>
+            <div><div class="contact-info-label">Phone</div><div class="contact-info-val">559.821.1526</div></div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-info-icon">📍</div>
+            <div><div class="contact-info-label">Service Area</div><div class="contact-info-val">Fresno, CA & Surrounding Areas</div></div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-info-icon">🕐</div>
+            <div><div class="contact-info-label">Hours</div><div class="contact-info-val">Mon–Sat: 8AM–6PM</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="contact-bottom-note">We typically respond within a few hours.<br>On-site visits available by appointment — we come to you.</div>
+    </div>
+
+    <div class="contact-right">
+      <div class="section-tag">Send a Message</div>
+      <div class="section-title" style="font-size:40px; margin-bottom:8px;">TELL US WHAT'S GOING ON</div>
+      <p class="section-sub">Fill out the form below and we'll get back to you quickly. The first conversation is always free — no commitment required.</p>
+
+      <div id="contact-form">
+        <form id="fs-form" action="https://formspree.io/f/mdawbvbl" method="POST">
+          <input type="hidden" name="_replyto" value="support@beyondthewire.us">
+          <div class="form-row">
+            <div class="form-group"><label>First Name</label><input type="text" name="first_name" placeholder="Jane" required></div>
+            <div class="form-group"><label>Last Name</label><input type="text" name="last_name" placeholder="Smith" required></div>
+          </div>
+          <div class="form-group"><label>Email Address</label><input type="email" name="email" placeholder="jane@email.com" required></div>
+          <div class="form-group"><label>Phone (Optional)</label><input type="tel" name="phone" placeholder="559.000.0000"></div>
+          <div class="form-group">
+            <label>What Do You Need Help With?</label>
+            <select name="service" required>
+              <option value="" disabled selected>Pick the closest match…</option>
+              <option>My computer is slow or broken</option>
+              <option>Wi-Fi or internet issues</option>
+              <option>Setting up a new device or printer</option>
+              <option>Virus, pop-ups, or security concerns</option>
+              <option>I have questions and need guidance</option>
+              <option>Something else entirely</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Describe the Problem</label><textarea name="message" placeholder="Tell us what's happening in your own words — no tech terms needed!"></textarea></div>
+          <button type="submit" class="form-submit">Send Message →</button>
+        </form>
+      </div>
+
+      <div class="form-success" id="form-success">
+        <h3>Message Received!</h3>
+        <p>Thanks for reaching out. We'll be back in touch shortly — usually within a few hours.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo">BEYOND THE <span>WIRE</span></div>
+    <div class="footer-copy">© 2025 Beyond the Wire · All rights reserved</div>
+  </footer>
+</div>
+
+<script>
+(function() {
+  function showPage(id) {
+    var pages = document.querySelectorAll('.page');
+    for (var i = 0; i < pages.length; i++) { pages[i].classList.remove('active'); }
+    var target = document.getElementById('page-' + id);
+    if (target) { target.classList.add('active'); }
+    var links = document.querySelectorAll('.nav-links a');
+    for (var j = 0; j < links.length; j++) { links[j].classList.remove('active'); }
+    var navEl = document.getElementById('nav-' + id);
+    if (navEl) { navEl.classList.add('active'); }
+    window.scrollTo(0, 0);
+  }
+
+  document.addEventListener('click', function(e) {
+    var el = e.target;
+    while (el && el !== document) {
+      var page = el.getAttribute && el.getAttribute('data-page');
+      if (page) {
+        e.preventDefault();
+        showPage(page);
+        return;
+      }
+      el = el.parentNode;
+    }
+  });
+
+  var form = document.getElementById('fs-form');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var btn = form.querySelector('.form-submit');
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      }).then(function(res) {
+        if (res.ok) {
+          document.getElementById('contact-form').style.display = 'none';
+          document.getElementById('form-success').style.display = 'block';
+        } else {
+          btn.textContent = 'Something went wrong - try again';
+          btn.disabled = false;
+        }
+      }).catch(function() {
+        btn.textContent = 'Network error - try again';
+        btn.disabled = false;
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>
