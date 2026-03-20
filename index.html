@@ -183,14 +183,14 @@
 <body>
 
 <nav>
-  <a class="nav-logo" onclick="showPage('home')">BEYOND THE <span class="dot">WIRE</span></a>
+  <a class="nav-logo" data-page="home">BEYOND THE <span class="dot">WIRE</span></a>
   <div class="nav-links">
-    <a onclick="showPage('home')" id="nav-home" class="active">Home</a>
-    <a onclick="showPage('about')" id="nav-about">About</a>
-    <a onclick="showPage('services')" id="nav-services">Services</a>
-    <a onclick="showPage('contact')" id="nav-contact">Contact</a>
+    <a id="nav-home" class="active" data-page="home">Home</a>
+    <a id="nav-about" data-page="about">About</a>
+    <a id="nav-services" data-page="services">Services</a>
+    <a id="nav-contact" data-page="contact">Contact</a>
   </div>
-  <button class="nav-cta" onclick="showPage('contact')">Get Help Now</button>
+  <button class="nav-cta" data-page="contact">Get Help Now</button>
 </nav>
 
 <!-- HOME -->
@@ -203,8 +203,8 @@
       <h1 class="fade-up fade-up-2">TECH HELP,<br><em>FOR REAL PEOPLE.</em></h1>
       <p class="hero-lead fade-up fade-up-3">Frustrated with your computer, Wi-Fi, or a device that just won't cooperate? We come to you — no jargon, no judgment, just friendly tech support that actually makes sense.</p>
       <div class="hero-actions fade-up fade-up-4">
-        <span class="btn-primary" onclick="showPage('services')">See What We Fix</span>
-        <span class="btn-outline" onclick="showPage('contact')">Book a Visit</span>
+        <a class="btn-primary" data-page="services" href="#">See What We Fix</a>
+        <a class="btn-outline" data-page="contact" href="#">Book a Visit</a>
       </div>
     </div>
   </div>
@@ -250,7 +250,7 @@
       <div class="service-card"><span class="service-icon">🛡️</span><h3>Virus or Security Worries</h3><p>Pop-ups, strange behavior, or a hacked account? We clean it up and help keep you protected going forward.</p></div>
     </div>
     <br><br>
-    <span class="btn-primary" onclick="showPage('services')">View All Services →</span>
+    <a class="btn-primary" data-page="services" href="#">View All Services →</a>
   </section>
 
   <footer>
@@ -360,7 +360,7 @@
     <div>
       <h3>HONEST PRICING. NO SURPRISES.</h3>
       <p>We believe tech help should be affordable and transparent. Every visit starts with a quick chat about what you need, and we'll always tell you what things will cost before we begin — no hidden fees, no pressure, no unnecessary upsells.</p>
-      <span class="btn-primary" onclick="showPage('contact')" style="display:inline-block; cursor:pointer;">Book a Free Consultation</span>
+      <a class="btn-primary" data-page="contact" href="#">Book a Free Consultation</a>
     </div>
   </div>
 
@@ -444,31 +444,62 @@
   </footer>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false">
+(function() {
   function showPage(id) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-' + id).classList.add('active');
-    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-    const navEl = document.getElementById('nav-' + id);
+    var pages = document.querySelectorAll('.page');
+    for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
+    var target = document.getElementById('page-' + id);
+    if (target) target.classList.add('active');
+    var links = document.querySelectorAll('.nav-links a');
+    for (var j = 0; j < links.length; j++) links[j].classList.remove('active');
+    var navEl = document.getElementById('nav-' + id);
     if (navEl) navEl.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
   }
 
-  const form = document.getElementById('fs-form');
+  // Event delegation - attach to document so Cloudflare cannot interfere
+  document.addEventListener('click', function(e) {
+    var el = e.target;
+    // Walk up the DOM in case click was on a child element (e.g. <span> inside <a>)
+    while (el && el !== document) {
+      var page = el.getAttribute('data-page');
+      if (page) {
+        e.preventDefault();
+        showPage(page);
+        return;
+      }
+      el = el.parentNode;
+    }
+  });
+
+  // Contact form - Formspree AJAX
+  var form = document.getElementById('fs-form');
   if (form) {
-    form.addEventListener('submit', async function(e) {
+    form.addEventListener('submit', function(e) {
       e.preventDefault();
-      const btn = form.querySelector('.form-submit');
-      btn.textContent = 'Sending…';
+      var btn = form.querySelector('.form-submit');
+      btn.textContent = 'Sending...';
       btn.disabled = true;
-      try {
-        const res = await fetch(form.action, {
-          method: 'POST',
-          body: new FormData(form),
-          headers: { 'Accept': 'application/json' }
-        });
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      }).then(function(res) {
         if (res.ok) {
           document.getElementById('contact-form').style.display = 'none';
           document.getElementById('form-success').style.display = 'block';
         } else {
-          btn.textConten
+          btn.textContent = 'Something went wrong - try again';
+          btn.disabled = false;
+        }
+      }).catch(function() {
+        btn.textContent = 'Network error - try again';
+        btn.disabled = false;
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>
